@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosInstance, AxiosError } from "axios";
 import { ElMessage } from "element-plus";
-import { ResultType } from "types/request";
+import { ResultType } from "@/types/request";
 import useUserStore from "@/store/modules/user";
 import router from "@/router";
 

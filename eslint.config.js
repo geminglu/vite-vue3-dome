@@ -2,6 +2,7 @@ import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
+import * as parserVue from "vue-eslint-parser";
 import configPrettier from "eslint-config-prettier";
 import pluginPrettier from "eslint-plugin-prettier";
 
@@ -14,7 +15,17 @@ export default [
   ...pluginVue.configs["flat/essential"],
   {
     files: ["**/*.vue"],
-    languageOptions: { parserOptions: { parser: tseslint.parser } },
+    languageOptions: {
+      parser: parserVue,
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+        extraFileExtensions: [".vue"],
+        parser: "@typescript-eslint/parser",
+        sourceType: "module",
+      },
+    },
   },
   {
     plugins: {
@@ -25,6 +36,7 @@ export default [
       "no-console": "error",
       "no-debugger": "error",
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
     },
   },
 ];

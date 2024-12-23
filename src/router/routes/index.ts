@@ -1,4 +1,4 @@
-import type { AppRouteRecordRaw } from "types/router";
+import type { AppRouteRecordRaw } from "@/types/router";
 import Layout from "@/layout/index.vue";
 
 export const constantRoutes: Array<AppRouteRecordRaw> = [
@@ -8,29 +8,22 @@ export const constantRoutes: Array<AppRouteRecordRaw> = [
     name: "SignIn",
     component: () => import("@/views/logIn/index.vue"),
   },
-  // {
-  //   path: "/",
-  //   name: "Home",
-  //   component: Layout,
-  //   // redirect: '/menu',
-  // },
-  // {
-  //   path: "/rootChat",
-  //   name: "RootChat",
-  //   component: () => import("@/views/chat/layout/index.vue"),
-  //   redirect: "/chat",
-  //   children: [
-  //     {
-  //       path: "/chat/:uuid?",
-  //       name: "Chat",
-  //       component: () => import("@/views/chat/index.vue"),
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: "/:pathMatch(.*)",
-  //   name: "NotFound",
-  //   component: () => import("@/views/404.vue"),
-
-  // },
+  {
+    path: "/",
+    name: "Home",
+    component: Layout,
+    redirect: "/user-list",
+    children: [
+      {
+        path: "/user-list",
+        name: "UserList",
+        component: () => import("@/views/UserList/index.vue"),
+      },
+      {
+        path: "/login-log",
+        name: "LoginLog",
+        component: () => import("@/views/LoginLog/index.vue"),
+      },
+    ],
+  },
 ];

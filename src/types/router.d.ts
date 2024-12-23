@@ -67,9 +67,9 @@ export type systemMenuType = {
   /**
    * 需要匹配的路由名称
    */
-  name: string;
+  name?: string;
   children?: systemMenuType[];
-  path?: string;
+  path: string;
 };
 
 declare module "vue-router" {
