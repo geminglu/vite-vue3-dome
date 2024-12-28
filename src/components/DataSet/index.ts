@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import type { configType, DateSetType } from "./type";
 import { AxiosRequestConfig } from "axios";
 import { request } from "@/utils/request";
+import { isNotEmpty } from "@/utils/is";
 
 export class DataSet implements DateSetType {
   /** 开启自动查询 */
   autoQuery = false;
   /** transport 存在时queryUrl将无效 */
   queryUrl = "";
-  queryParameter = {};
+  queryParameter = reactive<{ [x: string]: any }>({});
   /** transport 存在时queryUrl将无效 */
   transport;
   fields;
   queryform;
   /** 主键如果有嵌套需要使用 */
   primaryKey;
-  formQuery = {};
+  formQuery: { [x: string]: any } = {};
   tableData = ref([]);
   currentPage = ref(1);
   /** 分页大小 */
@@ -42,6 +43,11 @@ export class DataSet implements DateSetType {
     dataSet.paging !== undefined && (this.paging = dataSet.paging);
     dataSet.multiple !== undefined && (this.multiple = dataSet.multiple);
     dataSet.queryform !== undefined && (this.queryform = dataSet.queryform);
+    if (dataSet.queryParameter) {
+      for (const key in dataSet.queryParameter) {
+        this.queryParameter[key] = dataSet.queryParameter[key];
+      }
+    }
     if (dataSet.pageSizes && dataSet.pageSizes.length) {
       this.pageSizes = dataSet.pageSizes;
       this.pageSize.value = dataSet.pageSizes[0];
@@ -63,9 +69,14 @@ export class DataSet implements DateSetType {
       const param: {
         [x: string]: string | number;
       } = {
-        ...this.formQuery,
         ...data,
+        ...this.queryParameter,
       };
+      for (const key in this.formQuery) {
+        if (isNotEmpty(this.formQuery[key])) {
+          param[key] = this.formQuery[key];
+        }
+      }
       if (this.paging) param.page = this.currentPage.value;
       if (this.paging) param.pageSize = this.pageSize.value;
 

@@ -55,25 +55,42 @@ type FieldsType = {
   render?: (param: any) => JSX.Element;
 } & FieldsExtend;
 
-interface uplookType {
-  field: string;
-  value: any;
-}
-export interface QueryType {
-  name: string;
-  type: "uplook" | "text" | "date" | "datetime";
-  label: string;
-  /** 默认值 */
-  defaultValue?: any;
-  uplookList?: uplookType[];
-  url?: string;
-  fieldId?: string;
+export type QueryUplookType = {
+  type: "uplook";
+  code: string;
+  /** 默认值：value */
+  fieldValue?: string;
+  /** 默认值：name */
   fielidText?: string;
+  parma?: { [x: string]: any };
+};
+export type QueryTextType = {
+  type: "text";
+};
+export type QueryDateType = {
+  type: "date";
   /**
    * 日期组件显示在输入框中的格式
    */
   format?: string;
-}
+};
+export type QueryDatetimeType = {
+  type: "datetime";
+  /**
+   * 日期组件显示在输入框中的格式
+   */
+  format?: string;
+};
+
+export type QueryExtend = QueryUplookType | QueryTextType | QueryDateType | QueryDatetimeType;
+
+export type QueryType = {
+  name: string;
+  label: string;
+  defaultValue?: string;
+  /** 是否必填 */
+  required?: boolean;
+} & QueryExtend;
 
 interface EventType {
   /**
@@ -134,7 +151,7 @@ export interface DateSetType extends configType {
   disabled: Ref<boolean>;
   butQuery: Ref<boolean>;
   total: Ref<number>;
-  formQuery: { [index: string]: string };
+  formQuery: { [index: string]: any };
   /** 选中的行数据 */
   multipleSelection: Ref<Array<any>>;
   query: (data?: { [index: string]: any }) => any;

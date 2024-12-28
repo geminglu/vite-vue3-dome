@@ -1,28 +1,43 @@
 <template>
   <div>
-    <el-form v-if="dateSet.queryform" :inline="true" v-model="form">
-      <el-form-item v-for="item in dateSet.queryform" :key="item.name" :label="item.label">
+    <el-form
+      v-if="dateSet.queryform && dateSet.queryform?.length"
+      ref="ruleFormRef"
+      :inline="true"
+      :rules="rules"
+      label-width="auto"
+      :model="form"
+      class="queryForm"
+    >
+      <el-form-item
+        v-for="item in dateSet.queryform"
+        :key="item.name"
+        :label="item.label"
+        :prop="item.name"
+      >
         <el-input
           v-if="item.type === 'text'"
           v-model="form[item.name]"
           clearable
           :placeholder="`请输入${item.label}`"
+          style="width: 200px"
         />
-        <!-- <UpLook
+        <UpLook
           v-if="item.type === 'uplook'"
           v-model="form[item.name]"
-          :url="item.url"
-          :uplookList="item.uplookList"
-          :fieldId="item.fieldId"
+          :code="item.code"
+          :fieldValue="item.fieldValue"
           :fielidText="item.fielidText"
           :placeholder="`请选择${item.label}`"
-        /> -->
+          style="width: 200px"
+        />
         <el-date-picker
           v-if="item.type === 'date'"
           v-model="form[item.name]"
           type="date"
           :placeholder="`请选择${item.label}`"
           :format="item.format"
+          style="width: 200px"
         />
         <el-date-picker
           v-if="item.type === 'datetime'"
@@ -30,9 +45,10 @@
           type="datetime"
           :placeholder="`请选择${item.label}`"
           :format="item.format"
+          style="width: 200px"
         />
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="op">
         <el-button
           :disabled="dateSet.disabled.value"
           type="primary"
@@ -54,11 +70,7 @@
           text
           @click="query"
         >
-          <span
-            style="font-size: 12px; margin-right: 6px"
-            class="iconfont"
-            :class="`icon-shuaxin`"
-          />
+          <el-icon class="el-icon--left"><Icon icon="uil:redo" /></el-icon>
           刷新
         </el-button>
         <el-button
@@ -68,12 +80,7 @@
           text
           @click="item.click(dateSet, form)"
         >
-          <span
-            v-if="item.icon"
-            style="font-size: 12px; margin-right: 6px"
-            class="iconfont"
-            :class="`icon-${item.icon}`"
-          />
+          <el-icon class="el-icon--left"><Icon :icon="item.icon" /></el-icon>
           {{ item.name }}
         </el-button>
       </template>
@@ -138,11 +145,12 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, PropType, defineComponent } from "vue";
+import { ref, PropType, defineComponent, reactive } from "vue";
 import { DateSetType, headerButtonsType } from "@/components/DataSet/type";
-// import UpLook from "@/components/baseUi/uplook/index.vue";
-import { ElTable, ElTableColumn } from "element-plus";
+import UpLook from "@/components/baseUi/uplook/index.vue";
+import { ElTable, ElTableColumn, FormInstance, FormRules } from "element-plus";
 import dayjs from "dayjs";
+import { Icon } from "@iconify/vue";
 
 defineOptions({
   name: "BaseTable",
@@ -174,13 +182,18 @@ const props = defineProps({
   },
 });
 
+const ruleFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
 
 const formQuery: { [index: string]: string } = {};
+
+const form = ref<any>({ ...formQuery });
+const rules = reactive<FormRules>({});
+
 props.dateSet.queryform?.forEach(item => {
   formQuery[item.name] = item.defaultValue || "";
+  rules[item.name] = [{ required: item.required }];
 });
-const form = ref<any>({ ...formQuery });
 
 async function query() {
   const beforeQuery =
@@ -207,7 +220,11 @@ async function handelQuery() {
   try {
     props.dateSet.setLoading(true);
     props.dateSet.setFormData(form.value);
-    await query();
+    await ruleFormRef.value?.validate(async valid => {
+      if (valid) {
+        await query();
+      }
+    });
   } catch (error: any) {
     throw new Error(error);
   } finally {
@@ -246,4 +263,16 @@ const ExpandDom = defineComponent({
 });
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.queryForm {
+  display: flex;
+  flex-wrap: wrap;
+  .op {
+    display: flex;
+    flex: 1;
+    :deep(.el-form-item__content) {
+      justify-content: flex-end;
+    }
+  }
+}
+</style>
