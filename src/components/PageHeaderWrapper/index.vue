@@ -2,8 +2,8 @@
   <div class="page_header_wrapper">
     <div v-if="isShowBack || title" class="page-header">
       <div v-if="isShowBack" class="back" @click="navigation(backUrl)">
-        <span class="iconfont icon-fanhui_icon icon" />
-        {{ backText }}
+        <Icon icon="eva:arrow-back-outline" />
+        <span class="pl-1">{{ backText }}</span>
       </div>
       <el-divider v-if="isShowBack" direction="vertical" />
       <h2 class="title" v-if="title">{{ title }}</h2>
@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { el } from "element-plus/es/locales.mjs";
 import { useRouter } from "vue-router";
+import { Icon } from "@iconify/vue";
 
 defineOptions({
   name: "PageHeaderWrapper",
@@ -46,10 +46,13 @@ function navigation(path?: string) {
   display: flex;
   flex-direction: column;
   .page-header {
+    display: flex;
+    align-items: center;
     padding: 0 12px;
     height: 45px;
     .back {
-      display: inline-block;
+      display: flex;
+      align-items: center;
       line-height: 45px;
       cursor: pointer;
       vertical-align: middle;

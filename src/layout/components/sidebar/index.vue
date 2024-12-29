@@ -55,6 +55,28 @@ const systemMenu = computed(() => {
         },
       ],
     },
+    {
+      id: "2",
+      hidden: false,
+      icon: "icon-park-outline:system",
+      title: "系统管理",
+      pid: null,
+      type: "directory",
+      name: "系统管理",
+      path: "/system",
+      children: [
+        {
+          id: "21",
+          hidden: false,
+          icon: "codicon:symbol-enum",
+          title: "字典管理",
+          pid: "2",
+          type: "menu",
+          name: "字典管理",
+          path: "/dictionary-list",
+        },
+      ],
+    },
   ];
 
   return menu;

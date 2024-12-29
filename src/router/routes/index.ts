@@ -24,6 +24,16 @@ export const constantRoutes: Array<AppRouteRecordRaw> = [
         name: "LoginLog",
         component: () => import("@/views/LoginLog/index.vue"),
       },
+      {
+        path: "/dictionary-list",
+        name: "DictionaryList",
+        component: () => import("@/views/DictionaryList/index.vue"),
+      },
+      {
+        path: "/dictionary-details/:code",
+        name: "DictionaryDetails",
+        component: () => import("@/views/DictionaryList/dictionaryDetails.vue"),
+      },
     ],
   },
 ];
