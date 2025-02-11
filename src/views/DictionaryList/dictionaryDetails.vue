@@ -1,6 +1,6 @@
 <template>
   <PageHeaderWrapper :title="`字典列表-${route.params.code}`" isShowBack>
-    <BaseTable
+    <TableCom
       :dateSet="dateSet"
       :headerButtons="headerButtons"
       tableHeight="calc(100vh - 210px)"
@@ -26,9 +26,7 @@
 </template>
 
 <script setup lang="tsx">
-import BaseTable from "@/components/baseUi/Table/index.vue";
-import { DataSet } from "@/components/DataSet";
-import { headerButtonsType } from "@/components/DataSet/type";
+import TableCom from "@/components/ui/TableCom/index.vue";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper/index.vue";
 import { ElMessageBox, ElTag, ElButton, ElPopconfirm, ElMessage } from "element-plus";
 import { ref } from "vue";
@@ -41,6 +39,8 @@ import {
   patchDictionaryDetails,
 } from "@/serivce/system";
 import { useRoute } from "vue-router";
+import { headerButtonsType } from "@/hooks/useDataSet/type";
+import useDataSet from "@/hooks/useDataSet";
 
 defineOptions({
   name: "DictionaryList",
@@ -52,7 +52,7 @@ const addDictionaryRef = ref<typeof AddDictionaryDetails>();
 
 const addDrawerData = ref<CreateDictionaryDetailDto & { id: number }>();
 
-const dateSet = new DataSet({
+const dateSet = useDataSet({
   autoQuery: true,
   queryUrl: "/v1/system/dictionaryAllDetails",
   queryParameter: {

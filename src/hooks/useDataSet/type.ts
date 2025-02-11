@@ -1,13 +1,20 @@
 import { AxiosRequestConfig } from "axios";
 import type { Ref } from "vue";
-import { JSX } from "vue/jsx-runtime";
+import { PartialOption, RequiredProps } from "@/types";
+import type { useDataSetType } from ".";
 
 export interface headerButtonsObj {
   name: string;
   icon: string;
   // eslint-disable-next-line no-use-before-define
-  click: (dataSet: DateSetType, param: { [index: string]: any }) => void;
+  click: (dataSet: useDataSetType, param: { [index: string]: any }) => void;
 }
+
+export type CellEllipsisType =
+  | {
+      showTitle?: boolean;
+    }
+  | boolean;
 
 export type headerButton = "refresh" | "dele";
 
@@ -33,26 +40,53 @@ interface FieldsDateTimeType {
 }
 interface FieldsUplookType {
   type: "uplook";
-  field: string;
-  value: any;
+  uplookField: string;
+  uplookValue: any;
 }
 
-type FieldsExtend =
+export type SortOrder = "asc" | "desc" | null;
+export type Sort = {
+  prop: string;
+  order: SortOrder;
+};
+
+export type FieldsExtend =
   | FieldsTextType
   | FieldsDateType
   | FieldsDatetimeType
   | FieldsDateTimeType
   | FieldsUplookType;
 
-type FieldsType = {
+export type FieldsType = {
   name: string;
-  label: string /** 对应列的宽度 */;
-  width?: string | number;
-  /** 对应列的最小宽度， 对应列的最小宽度， 与 width 的区别是 width 是固定的，min-width 会把剩余宽度按比例分配给设置了 min-width 的列 */
-  minWidth?: string | number;
-  /** 列是否固定在左侧或者右侧。 true 表示固定在左侧 */
-  fixed?: string | boolean;
-  render?: (param: any) => JSX.Element;
+  label: string;
+  /** 隐藏列 */
+  hidden?: boolean;
+  sorter?: boolean;
+  sortOrder?: SortOrder | { sortOrder: SortOrder; priority?: number };
+  defaultSortOrder?: SortOrder;
+  sortDirections?: SortOrder[];
+  showSorterTooltip?: boolean;
+  colSpan?: number;
+  customRender?: (opt: {
+    value: any;
+    text: any;
+    record: Record<string, any>;
+    index: number;
+    column: FieldsType;
+  }) => JSX.Element;
+  rowSpan?: number;
+  width?: number | string;
+  minWidth?: number;
+  maxWidth?: number;
+  /** 是否可拖动调整宽度，此时 width 必须是 number 类型 */
+  resizable?: boolean;
+  /** 列是否固定，可选 true(等效于 left) 'left' 'right' */
+  fixed?: "left" | "right" | boolean;
+  /** 超过宽度将自动省略 */
+  ellipsis?: CellEllipsisType;
+  /** 设置列的对齐方式 */
+  align?: "left" | "center" | "right";
 } & FieldsExtend;
 
 export type QueryUplookType = {
@@ -92,7 +126,7 @@ export type QueryType = {
   required?: boolean;
 } & QueryExtend;
 
-interface EventType {
+export interface EventType {
   /**
    * 点击搜索表单重置时调用
    */
@@ -102,8 +136,7 @@ interface EventType {
    * @description 如果返回 false 将停止查询，如果返回对象会覆盖查询参数，如果返回 undefined 不会影响查询逻辑
    */
   beforeQuery: (data: {
-    // eslint-disable-next-line no-use-before-define
-    dataSet: DateSetType;
+    dataSet: useDataSetType;
     params: { [index: string]: any };
   }) => { [index: string]: any } | boolean | void;
   /**
@@ -115,55 +148,49 @@ interface EventType {
    * 数据加载完成后执行
    */
   // eslint-disable-next-line no-use-before-define
-  onLoad: (dataSet: DateSetType, data: any[]) => void;
+  onLoad: (dataSet: useDataSetType, data: any[]) => void;
 }
 
 export interface configType {
   queryform?: QueryType[];
-  /** 开启自动查询 */
+  /** 开启自动查询，默认true */
   autoQuery?: boolean;
   /** transport 存在时queryUrl将无效 */
   queryUrl?: string;
   queryParameter?: { [index: string]: any };
   /** transport 存在时queryUrl将无效 */
-  transport?: TransportType | undefined;
+  transport?: TransportType;
   fields: FieldsType[];
   /** 主键如果有嵌套需要使用 */
   primaryKey?: string;
   pageSizes?: number[];
+  /** 分页大小,默认100 */
+  pageSize?: number;
   /** 是否有分页 */
   paging?: boolean;
   /** 多选 */
   multiple?: boolean;
+
+  /** 是否保留被选中的数据 */
+  reserveSelection?: boolean;
+
   /**
    * 事件
    */
   events?: Partial<EventType>;
-
-  /** 是否保留被选中的数据 */
-  reserveSelection?: boolean;
 }
-export interface DateSetType extends configType {
-  /** 分页大小,默认100 */
-  pageSize?: Ref<number>;
-  tableData: Ref<any[]>;
-  currentPage: Ref<number>;
-  disabled: Ref<boolean>;
-  butQuery: Ref<boolean>;
-  total: Ref<number>;
+
+export interface DateSetType
+  extends PartialOption<
+    RequiredProps<Omit<configType, "events">>,
+    "queryUrl" | "transport" | "primaryKey"
+  > {
+  /** 当前分页 */
+  currentPage: number;
+  disabled: boolean;
+  butQuery: boolean;
+  total: number;
   formQuery: { [index: string]: any };
   /** 选中的行数据 */
   multipleSelection: Ref<Array<any>>;
-  query: (data?: { [index: string]: any }) => any;
-  /** 加载数据 */
-  load: (data: any) => any;
-  /** 设置分页大小 */
-  handleSize: (size: number) => void;
-  /** 设置分页 */
-  handleCurrent: (page: number) => void;
-  /** 设置加载状态 */
-  setLoading: (loading: boolean) => void;
-  /** 设置表单数据 */
-  setFormData: (data: any) => void;
-  setMultipleSelection: (data: any) => void;
 }

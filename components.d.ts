@@ -45,7 +45,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Table: typeof import('./src/components/baseUi/Table/index.vue')['default']
-    Uplook: typeof import('./src/components/baseUi/uplook/index.vue')['default']
+    TableCom: typeof import('./src/components/ui/TableCom/index.vue')['default']
+    Uplook: typeof import('./src/components/ui/uplook/index.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

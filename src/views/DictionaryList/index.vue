@@ -1,10 +1,6 @@
 <template>
   <PageHeaderWrapper title="字典列表">
-    <BaseTable
-      :dateSet="dateSet"
-      :headerButtons="headerButtons"
-      tableHeight="calc(100vh - 210px)"
-    />
+    <TableCom :dateSet="dateSet" :headerButtons="headerButtons" tableHeight="calc(100vh - 210px)" />
   </PageHeaderWrapper>
   <el-drawer
     v-model="addDrawer"
@@ -26,22 +22,29 @@
 </template>
 
 <script setup lang="tsx">
-import BaseTable from "@/components/baseUi/Table/index.vue";
-import { DataSet } from "@/components/DataSet";
-import { headerButtonsType } from "@/components/DataSet/type";
+import TableCom from "@/components/ui/TableCom/index.vue";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper/index.vue";
-import { ElMessageBox, ElTag, ElButton, ElPopconfirm, ElMessage, ElLink } from "element-plus";
+import {
+  ElMessageBox,
+  ElTag,
+  ElButton,
+  ElPopconfirm,
+  ElMessage,
+  ElLink,
+  ElDivider,
+} from "element-plus";
 import { ref } from "vue";
 import AddDictionary from "./AddDictionary.vue";
 import {
   createDictionary,
   CreateDictionaryDto,
   deleteDictionary,
-  DictionaryListDto,
   patchDictionary,
 } from "@/serivce/system";
 import { RequiredProps } from "@/types";
 import { useRouter } from "vue-router";
+import useDataSet from "@/hooks/useDataSet";
+import type { headerButtonsType } from "@/hooks/useDataSet/type";
 
 defineOptions({
   name: "DictionaryList",
@@ -54,7 +57,7 @@ const addDictionaryRef = ref<typeof AddDictionary>();
 
 const addDrawerData = ref<RequiredProps<CreateDictionaryDto> & { id: number }>();
 
-const dateSet = new DataSet({
+const dateSet = useDataSet({
   autoQuery: true,
   queryUrl: "/v1/system/dictionary",
   primaryKey: "id",
@@ -78,20 +81,25 @@ const dateSet = new DataSet({
     },
   ],
   fields: [
-    { label: "字段名称", name: "name", type: "text" },
+    {
+      label: "字段名称",
+      name: "name",
+      type: "text",
+      width: 200,
+      sorter: true,
+      // defaultSortOrder: "descend",
+    },
     {
       label: "字段编码",
+      width: 100,
       name: "code",
       type: "text",
-      render: (param: DictionaryListDto) => {
+      sorter: true,
+      customRender: ({ value }) => {
         return (
           <span>
-            <ElLink
-              link
-              type="primary"
-              onClick={() => router.push(`/dictionary-details/${param.code}`)}
-            >
-              {param.code}
+            <ElLink type="primary" onClick={() => router.push(`/dictionary-details/${value}`)}>
+              {value}
             </ElLink>
           </span>
         );
@@ -100,45 +108,46 @@ const dateSet = new DataSet({
     {
       label: "状态",
       name: "status",
+      width: 100,
       type: "text",
-      render: (row: any) => {
-        return row.status === "1" ? (
+      customRender: ({ value }) => {
+        return value === "1" ? (
           <ElTag type="primary">启用</ElTag>
         ) : (
           <ElTag type="danger">禁用</ElTag>
         );
       },
     },
-    { label: "备注", name: "remark", type: "text" },
-    { label: "创建时间", name: "createAt", type: "datetime" },
+    { label: "备注", name: "remark", type: "text", width: 200 },
+    { label: "创建时间", name: "createAt", type: "datetime", width: 400 },
     {
       label: "操作",
       type: "text",
       name: "operation",
-      fixed: "right",
-      render: (param: DictionaryListDto) => {
+      width: 200,
+      customRender: ({ record }) => {
         return (
           <span>
-            <ElButton
-              link
+            <ElLink
               type="primary"
+              underline={false}
               onClick={() => {
-                addDrawerData.value = param;
+                addDrawerData.value = record;
                 addDrawer.value = true;
               }}
             >
               编辑
-            </ElButton>
-            <el-divider direction="vertical" />
+            </ElLink>
+            <ElDivider direction="vertical" />
             <ElPopconfirm
               title="删除后无法恢复是否继续？"
-              onConfirm={() => handleDeleteDrawer(param.id)}
+              onConfirm={() => handleDeleteDrawer(record.id)}
             >
               {{
-                reference: () => (
-                  <ElButton link type="danger">
+                reference: (
+                  <ElLink type="danger" underline={false}>
                     删除
-                  </ElButton>
+                  </ElLink>
                 ),
               }}
             </ElPopconfirm>

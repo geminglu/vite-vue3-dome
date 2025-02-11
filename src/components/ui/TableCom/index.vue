@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-form
-      v-if="dateSet.queryform && dateSet.queryform?.length"
+      v-if="dateSet.config.queryform && dateSet.config.queryform?.length"
       ref="ruleFormRef"
       :inline="true"
       :rules="rules"
@@ -10,7 +10,7 @@
       class="queryForm"
     >
       <el-form-item
-        v-for="item in dateSet.queryform"
+        v-for="item in dateSet.config.queryform"
         :key="item.name"
         :label="item.label"
         :prop="item.name"
@@ -50,14 +50,14 @@
       </el-form-item>
       <el-form-item class="op">
         <el-button
-          :disabled="dateSet.disabled.value"
+          :disabled="dateSet.config.disabled"
           type="primary"
           @click="handelQuery"
-          :loading="dateSet.butQuery.value"
+          :loading="dateSet.config.butQuery"
         >
           查 询
         </el-button>
-        <el-button :disabled="dateSet.disabled.value" @click="resetForm">重 置</el-button>
+        <el-button :disabled="dateSet.config.disabled" @click="resetForm">重 置</el-button>
       </el-form-item>
     </el-form>
     <div>
@@ -66,7 +66,7 @@
           v-if="typeof item === 'string' && item === 'refresh'"
           :key="item"
           type="primary"
-          :disabled="dateSet.disabled.value"
+          :disabled="dateSet.config.disabled"
           text
           @click="query"
         >
@@ -86,33 +86,47 @@
       </template>
     </div>
     <el-table
-      :row-key="dateSet.primaryKey"
-      :data="dateSet.tableData.value"
-      v-loading="dateSet.disabled.value"
+      :row-key="dateSet.config.primaryKey"
+      :data="dateSet.tableData"
+      v-loading="dateSet.config.disabled"
       stripe
       @selection-change="handleSelectionChange"
       :size="size"
       ref="tableRef"
+      @sort-change="sortChange"
       :height="tableHeight"
+      :header-cell-class-name="handleHeaderCellClass"
     >
       <el-table-column
-        v-if="dateSet.multiple"
+        v-if="dateSet.config.multiple"
         type="selection"
         width="45"
-        :reserve-selection="dateSet.reserveSelection"
+        :reserve-selection="dateSet.config.reserveSelection"
       />
       <el-table-column
-        v-for="item in dateSet.fields"
+        v-for="item in dateSet.config.fields"
         :key="item.name"
+        :sortable="item.sortOrder !== undefined && 'sortOrder'"
         :label="item.label"
         show-overflow-tooltip
         :width="item.width"
+        :header="{}"
         :prop="item.name"
         :min-width="item.minWidth"
         :fixed="item.fixed"
       >
         <template #default="scope">
-          <ExpandDom v-if="item.render" :render="item.render" :params="scope.row" />
+          <ExpandDom
+            v-if="item.customRender"
+            :render="item.customRender"
+            :params="{
+              record: scope.row,
+              value: scope.row[item.name],
+              text: item.name,
+              index: scope.$index,
+              column: dateSet.config.fields,
+            }"
+          />
           <template v-else-if="item.type === 'text'">{{ scope.row[item.name] }}</template>
           <template v-else-if="item.type === 'datetime'">
             {{ dayjs(scope.row[item.name]).format(item.format || "YYYY-MM-DD HH:mm:ss") }}
@@ -129,13 +143,13 @@
     </el-table>
     <div class="flex justify-end pt-4 border-t">
       <el-pagination
-        v-if="dateSet.paging"
-        :current-page="dateSet.currentPage.value"
-        :page-size="dateSet.pageSize?.value"
-        :page-sizes="dateSet.pageSizes"
-        :disabled="dateSet.disabled.value"
+        v-if="dateSet.config.paging"
+        :current-page="dateSet.config.currentPage"
+        :page-size="dateSet.config.pageSize"
+        :page-sizes="dateSet.config.pageSizes"
+        :disabled="dateSet.config.disabled"
         :layout="pagingLayout"
-        :total="dateSet.total.value"
+        :total="dateSet.config.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :small="size === 'small'"
@@ -146,11 +160,12 @@
 
 <script setup lang="tsx">
 import { ref, PropType, defineComponent, reactive } from "vue";
-import { DateSetType, headerButtonsType } from "@/components/DataSet/type";
-import UpLook from "@/components/baseUi/uplook/index.vue";
+import type { headerButtonsType } from "@/hooks/useDataSet/type";
+import UpLook from "@/components/ui/uplook/index.vue";
 import { ElTable, ElTableColumn, FormInstance, FormRules } from "element-plus";
 import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
+import { useDataSetType } from "@/hooks/useDataSet";
 
 defineOptions({
   name: "BaseTable",
@@ -158,7 +173,7 @@ defineOptions({
 
 const props = defineProps({
   dateSet: {
-    type: Object as PropType<DateSetType>,
+    type: Object as PropType<useDataSetType>,
     default: () => {},
   },
   headerButtons: {
@@ -182,6 +197,18 @@ const props = defineProps({
   },
 });
 
+const orderMap = {
+  asc: "ascending",
+  desc: "descending",
+};
+
+const sortOrder = reactive(
+  props.dateSet.sort.map(item => ({
+    ...item,
+    order: item.order ? orderMap[item.order] : null,
+  })),
+);
+
 const ruleFormRef = ref<FormInstance>();
 const tableRef = ref<InstanceType<typeof ElTable>>();
 
@@ -190,7 +217,7 @@ const formQuery: { [index: string]: string } = {};
 const form = ref<any>({ ...formQuery });
 const rules = reactive<FormRules>({});
 
-props.dateSet.queryform?.forEach(item => {
+props.dateSet.config.queryform?.forEach(item => {
   formQuery[item.name] = item.defaultValue || "";
   rules[item.name] = [{ required: item.required }];
 });
@@ -198,7 +225,7 @@ props.dateSet.queryform?.forEach(item => {
 async function query() {
   const beforeQuery =
     props.dateSet.events?.beforeQuery &&
-    props.dateSet.events.beforeQuery({ dataSet: props.dateSet, params: form.value });
+    props.dateSet.events.beforeQuery({ dataSet: props.dateSet, params: form });
   if (typeof beforeQuery === "boolean" && beforeQuery === false) {
     return;
   }
@@ -219,7 +246,7 @@ const handleSelectionChange = (val: any) => {
 async function handelQuery() {
   try {
     props.dateSet.setLoading(true);
-    props.dateSet.setFormData(form.value);
+    props.dateSet.setFormData(form);
     await ruleFormRef.value?.validate(async valid => {
       if (valid) {
         await query();
@@ -248,6 +275,33 @@ function resetForm() {
   form.value = { ...formQuery };
   query();
 }
+
+function sortChange({ prop, order }: { prop: string; order: "descending" | "ascending" | null }) {
+  const sort = sortOrder.find(item => item.prop === prop);
+  if (sort) {
+    sort.order = order;
+    setSort();
+    query();
+  }
+}
+
+function setSort() {
+  props.dateSet.setSort(
+    sortOrder.map(item => ({
+      ...item,
+      order: item.order ? (item.order === "descending" ? "desc" : "asc") : null,
+    })),
+  );
+}
+
+const handleHeaderCellClass = ({ column }: { column: any }) => {
+  sortOrder.forEach(item => {
+    if (column.property === item.prop) {
+      column.order = item.order;
+    }
+  });
+  return "";
+};
 
 defineExpose({
   // multipleSelection,

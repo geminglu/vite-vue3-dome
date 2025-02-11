@@ -1,6 +1,6 @@
 <template>
   <PageHeaderWrapper title="用户列表">
-    <BaseTable
+    <TableCom
       :dateSet="dateSet"
       :headerButtons="headerButtons"
       tableHeight="calc(100vh - 210px)"
@@ -9,16 +9,16 @@
 </template>
 
 <script setup lang="tsx">
-import BaseTable from "@/components/baseUi/Table/index.vue";
-import { DataSet } from "@/components/DataSet";
-import { headerButtonsType } from "@/components/DataSet/type";
+import TableCom from "@/components/ui/TableCom/index.vue";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper/index.vue";
+import useDataSet from "@/hooks/useDataSet";
+import { headerButtonsType } from "@/hooks/useDataSet/type";
 
 defineOptions({
   name: "LoginLog",
 });
 
-const dateSet = new DataSet({
+const dateSet = useDataSet({
   autoQuery: true,
   queryUrl: "/v1/user/getLoginLogs",
   primaryKey: "id",
