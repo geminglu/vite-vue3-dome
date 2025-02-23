@@ -75,6 +75,16 @@ const systemMenu = computed(() => {
           name: "字典管理",
           path: "/dictionary-list",
         },
+        {
+          id: "22",
+          hidden: false,
+          icon: "codicon:symbol-enum",
+          title: "系统菜单",
+          pid: "2",
+          type: "menu",
+          name: "系统菜单",
+          path: "/system/system-menu",
+        },
       ],
     },
   ];

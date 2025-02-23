@@ -21,8 +21,8 @@ export function randomColor(min: number, max: number): string {
   return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
 
-export function arrayToTree(list: any[], root = null) {
-  const result = []; // 用于存放结果
+export function arrayToTree<T>(list: any[], root = null) {
+  const result: T[] = []; // 用于存放结果
   const map: any = {}; // 用于存放 list 下的节点
 
   // 1. 遍历 list，将 list 下的所有节点以 id 作为索引存入 map
@@ -35,7 +35,7 @@ export function arrayToTree(list: any[], root = null) {
     // 3. 获取节点的 id 和 父 id
     const { id, pid } = item; // ES6 解构赋值
     // 4. 如果是根节点，存入 result
-    if (item.pid === root) {
+    if (pid === root || map[pid] === undefined) {
       result.push(map[id]);
     } else {
       // 5. 反之，存入到父节点

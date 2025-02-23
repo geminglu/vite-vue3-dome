@@ -180,6 +180,40 @@ export type DictionaryDetailPage = {
   total: number;
 };
 
+interface MenuMenu {
+  type: "menu";
+  path: string;
+}
+interface MenuDir {
+  type: "dir";
+  path: undefined;
+}
+
+export type SystemMenuListDto = {
+  id: string;
+  /**
+   * 是否隐藏菜单
+   */
+  hidden: "0" | "1";
+  /**
+   * icon，如果创建目录icon必填
+   */
+  icon?: string;
+  pid: string | null;
+  /**
+   * 状态，0:禁用；1:启用
+   */
+  status: string;
+  /**
+   * title
+   */
+  title: string;
+  remark?: string;
+  createAt: string;
+} & (MenuMenu | MenuDir);
+
+export type CreateSystemMenu = Omit<SystemMenuListDto, "id" | "createAt">;
+
 /**
  * 创建字典
  */
@@ -254,6 +288,50 @@ export function patchDictionaryDetails(
 export function deleteDictionaryDetail(id: number) {
   return request({
     url: `/v1/system/dictionaryDetails/${id}`,
+    method: "delete",
+  });
+}
+
+/**
+ * 查询菜单列表
+ */
+export function getMenuList() {
+  return request<SystemMenuListDto[]>({
+    url: "/v1/system/menu",
+    method: "get",
+  });
+}
+
+/**
+ * 创建系统菜单
+ */
+export function createSysMenu(data: CreateSystemMenu) {
+  return request<SystemMenuListDto[]>({
+    url: "/v1/system/menu",
+    method: "post",
+    data,
+  });
+}
+
+/**
+ * 修改系统菜单
+ */
+export function patchSysMenu(
+  id: string,
+  data: CreateSystemMenu,
+) {
+  return request<DictionaryListDto>({
+    url: `/v1/system/menu/${id}`,
+    method: "patch",
+    data,
+  });
+}
+/**
+ * 删除系统菜单
+ */
+export function deleteSysMenu(id: string) {
+  return request({
+    url: `/v1/system/menu/${id}`,
     method: "delete",
   });
 }
