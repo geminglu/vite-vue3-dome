@@ -6,5 +6,29 @@
 // biome-ignore lint: disable
 export {}
 declare global {
-
+  const avatarGroupInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useAvatarGroup.js')['avatarGroupInjectionKey']
+  const buttonGroupInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useButtonGroup.js')['buttonGroupInjectionKey']
+  const defineLocale: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/defineLocale.js')['defineLocale']
+  const defineShortcuts: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts.js')['defineShortcuts']
+  const extendDevtoolsMeta: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/extendDevtoolsMeta.js')['extendDevtoolsMeta']
+  const extractShortcuts: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts.js')['extractShortcuts']
+  const formBusInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['formBusInjectionKey']
+  const formFieldInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['formFieldInjectionKey']
+  const formInputsInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['formInputsInjectionKey']
+  const formLoadingInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['formLoadingInjectionKey']
+  const formOptionsInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['formOptionsInjectionKey']
+  const inputIdInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['inputIdInjectionKey']
+  const kbdKeysMap: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useKbd.js')['kbdKeysMap']
+  const localeContextInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useLocale.js')['localeContextInjectionKey']
+  const modalInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useModal.js')['modalInjectionKey']
+  const slideoverInjectionKey: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useSlideover.js')['slideoverInjectionKey']
+  const useAvatarGroup: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useAvatarGroup.js')['useAvatarGroup']
+  const useButtonGroup: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useButtonGroup.js')['useButtonGroup']
+  const useComponentIcons: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useComponentIcons.js')['useComponentIcons']
+  const useFormField: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useFormField.js')['useFormField']
+  const useKbd: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useKbd.js')['useKbd']
+  const useLocale: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useLocale.js')['useLocale']
+  const useModal: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useModal.js')['useModal']
+  const useSlideover: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useSlideover.js')['useSlideover']
+  const useToast: typeof import('./node_modules/@nuxt/ui/dist/runtime/composables/useToast.js')['useToast']
 }

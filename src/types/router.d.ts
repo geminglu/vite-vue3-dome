@@ -1,4 +1,5 @@
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
+import type { SystemMenuListDto } from "@/serivce/system";
 
 export {};
 
@@ -43,35 +44,9 @@ export interface AppRouteRecordRaw extends Omit<RouteRecordRaw, "meta"> {
 }
 
 export type systemMenuType = {
-  id: string;
-  /**
-   * 是否在菜单中隐藏
-   */
-  hidden: boolean;
-  /**
-   * icon
-   */
-  icon: string;
-  /**
-   * 标题
-   */
-  title: string;
-  /**
-   * 父级
-   */
-  pid: string | null;
-  /**
-   * 类型，menu：菜单；directory：目录
-   */
-  type: "menu" | "directory";
-  /**
-   * 需要匹配的路由名称
-   */
-  name?: string;
   children?: systemMenuType[];
-  path: string;
-};
+} & SystemMenuListDto;
 
 declare module "vue-router" {
-  type RouteMeta = Meta
+  type RouteMeta = Meta;
 }

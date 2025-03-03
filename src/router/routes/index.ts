@@ -8,5 +8,15 @@ export const constantRoutes: Array<AppRouteRecordRaw> = [
     name: "SignIn",
     component: () => import("@/views/logIn/index.vue"),
   },
+  {
+    path: "/403",
+    name: "NoPermission",
+    component: () => import("@/views/error/NoPermission.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)",
+    name: "NotFound",
+    component: () => import("@/views/error/NotFound.vue"),
+  },
   ...asyncRoutes,
 ];

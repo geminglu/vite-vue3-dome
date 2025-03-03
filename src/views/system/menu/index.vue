@@ -46,6 +46,7 @@ import {
   SystemMenuListDto,
 } from "@/serivce/system";
 import { arrayToTree } from "@/utils";
+import { Icon } from "@iconify/vue/dist/iconify.js";
 
 defineOptions({
   name: "SystemMenu",
@@ -71,13 +72,22 @@ const dateSet = useDataSet({
       label: "菜单名称",
       name: "title",
       type: "text",
-      minWidth: 200
+      minWidth: 200,
     },
     {
       label: "url",
       name: "path",
       type: "text",
       minWidth: 200,
+    },
+    {
+      label: "icon",
+      name: "icon",
+      width: 100,
+      type: "text",
+      customRender: ({ value }) => {
+        return <Icon icon={value} />;
+      },
     },
     {
       label: "状态",

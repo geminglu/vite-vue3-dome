@@ -23,7 +23,7 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["src/*"],
-      "@build/*": ["build/*"],
+      "@build/*": ["build/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]

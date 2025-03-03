@@ -1,4 +1,15 @@
+import { asyncRoutes } from "@/router/routes/async";
+import { getPermissionMenu, SystemMenuListDto } from "@/serivce/system";
 import { defineStore } from "pinia";
+import {
+  createRouter,
+  createRouterMatcher,
+  createWebHistory,
+  RouteRecord,
+  RouteRecordRaw,
+} from "vue-router";
+import { arrayToTree } from "@/utils";
+import { systemMenuType } from "@/types/router";
 
 export type LanguageType = "zh-CN" | "zh-TW" | "en-US" | "ko-KR" | "ru-RU";
 
@@ -29,6 +40,10 @@ export interface appType {
   device: "mobile" | "desktop";
   /** 菜单布局 */
   layoutTheme: "vertical" | "horizontal" | "mix";
+  asyncRouterFlat: RouteRecord[];
+  asyncRouterMatcherFlat: any[];
+  menu: systemMenuType[];
+  menuFlat: SystemMenuListDto[];
 }
 
 const { themeColor, themeColorName } = JSON.parse(localStorage.getItem("appStore") || "{}");
@@ -45,8 +60,14 @@ const useAppStore = defineStore("appStore", {
     mobileCollapse: false,
     layoutTheme: "vertical",
     secondaryMenuCollapse: true,
+    asyncRouterFlat: [],
+    menu: [],
+    menuFlat: [],
+    asyncRouterMatcherFlat: [],
   }),
-  persist: true,
+  persist: {
+    omit: ["asyncRouterFlat", "menu"],
+  },
   actions: {
     /**
      * 设置缓存
@@ -89,6 +110,38 @@ const useAppStore = defineStore("appStore", {
      */
     setSecondaryMenuCollapse(status: boolean) {
       this.secondaryMenuCollapse = status;
+    },
+
+    getAsyncRouterFlat() {
+      if (!this.asyncRouterFlat.length) {
+        const router = createRouter({
+          history: createWebHistory(),
+          routes: asyncRoutes as unknown as RouteRecordRaw[],
+        }).getRoutes();
+        this.asyncRouterFlat = router;
+      }
+      return this.asyncRouterFlat;
+    },
+
+    getAsyncRouterMatcherFlat() {
+      if (!this.asyncRouterMatcherFlat.length) {
+        const router = createRouterMatcher(
+          asyncRoutes as unknown as RouteRecordRaw[],
+          {},
+        ).getRoutes();
+        this.asyncRouterMatcherFlat = router;
+      }
+      return this.asyncRouterMatcherFlat;
+    },
+
+    /**
+     * 设置系统菜单
+     */
+    async setMenu() {
+      const result = await getPermissionMenu();
+      this.menu = arrayToTree<systemMenuType>(result.data || []);
+      this.menuFlat = result.data || [];
+      return this.menu;
     },
   },
 });

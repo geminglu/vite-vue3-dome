@@ -28,7 +28,7 @@
             <el-icon
               v-if="existRoute.find(route => route.path === item.path)"
               style="color: var(--el-color-success)"
-              >
+            >
               <CircleCheck />
             </el-icon>
           </div>
@@ -63,6 +63,7 @@ import { FormInstance, FormRules } from "element-plus";
 import { reactive, ref, onBeforeMount, computed } from "vue";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import { CircleCheck } from "@element-plus/icons-vue";
+import useAppStore from "@/store/modules/app";
 
 defineOptions({
   name: "AddMenu",
@@ -75,6 +76,7 @@ interface PropsType {
 type useSystemMenuListDto = Omit<SystemMenuListDto, "id" | "createAt">;
 
 const props = defineProps<PropsType>();
+const appStore = useAppStore();
 
 const dirList = reactive<{ title: string; id: string }[]>([{ title: "根目录", id: "/" }]);
 const existRoute = reactive<SystemMenuListDto[]>([]);
@@ -101,12 +103,7 @@ const rules: FormRules<useSystemMenuListDto> = {
   path: [{ required: true, trigger: "blur" }],
 };
 
-const routes = computed(() =>
-  createRouter({
-    routes: asyncRoutes as RouteRecordRaw[],
-    history: createWebHistory(),
-  }).getRoutes(),
-);
+const routes = computed(() => appStore.getAsyncRouterFlat());
 
 const querySearch = (queryString: string, cb: any) => {
   const results = queryString

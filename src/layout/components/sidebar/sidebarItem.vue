@@ -1,6 +1,6 @@
 <template>
-  <template v-if="!item?.hidden">
-    <el-sub-menu v-if="item.children && item.children.length" :index="item.path">
+  <template v-if="item.hidden === '1'">
+    <el-sub-menu v-if="item.children && item.children.length" :index="item.id">
       <template #title>
         <el-icon v-if="item.icon">
           <Icon :icon="item.icon" />

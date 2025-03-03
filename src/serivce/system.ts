@@ -316,10 +316,7 @@ export function createSysMenu(data: CreateSystemMenu) {
 /**
  * 修改系统菜单
  */
-export function patchSysMenu(
-  id: string,
-  data: CreateSystemMenu,
-) {
+export function patchSysMenu(id: string, data: CreateSystemMenu) {
   return request<DictionaryListDto>({
     url: `/v1/system/menu/${id}`,
     method: "patch",
@@ -333,5 +330,15 @@ export function deleteSysMenu(id: string) {
   return request({
     url: `/v1/system/menu/${id}`,
     method: "delete",
+  });
+}
+
+/**
+ * 获取权限菜单
+ */
+export function getPermissionMenu() {
+  return request<SystemMenuListDto[]>({
+    url: "/v1/system/permissionMenu",
+    method: "get",
   });
 }
