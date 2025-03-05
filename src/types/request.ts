@@ -8,3 +8,8 @@ export interface ResultType<T = any> {
   /** 接口信息 */
   message?: string;
 }
+
+export interface PagingResultType<T = any> extends Omit<ResultType, "data"> {
+  total: number;
+  list: Array<T>;
+}

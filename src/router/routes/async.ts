@@ -33,6 +33,11 @@ export const asyncRoutes: Array<AppRouteRecordRaw> = [
         name: "SystemMenu",
         component: () => import("@/views/system/menu/index.vue"),
       },
+      {
+        path: "/system/system-dept",
+        name: "SystemDept",
+        component: () => import("@/views/system/dept/index.vue"),
+      },
     ],
   },
 ];

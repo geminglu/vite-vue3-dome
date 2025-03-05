@@ -18,11 +18,11 @@ export function randomColor(min: number, max: number): string {
   const r = randomNum(min, max);
   const g = randomNum(min, max);
   const b = randomNum(min, max);
-  return 'rgb(' + r + ',' + g + ',' + b + ')';
+  return "rgb(" + r + "," + g + "," + b + ")";
 }
 
 export function arrayToTree<T>(list: any[], root = null) {
-  const result: T[] = []; // 用于存放结果
+  const result: (T & { children: T[] })[] = []; // 用于存放结果
   const map: any = {}; // 用于存放 list 下的节点
 
   // 1. 遍历 list，将 list 下的所有节点以 id 作为索引存入 map
@@ -50,7 +50,7 @@ export function arrayToTree<T>(list: any[], root = null) {
 
 /** hex转rgb */
 function hexToRgb(str: string) {
-  const hxs: any = str.replace('#', '').match(/../g);
+  const hxs: any = str.replace("#", "").match(/../g);
   for (let i = 0; i < 3; i++) hxs[i] = parseInt(hxs[i], 16);
   return hxs;
 }
@@ -61,7 +61,7 @@ function rgbToHex(a: number, b: number, c: number) {
   for (let i = 0; i < 3; i++) {
     if (hexs[i].length === 1) hexs[i] = `0${hexs[i]}`;
   }
-  return `#${hexs.join('')}`;
+  return `#${hexs.join("")}`;
 }
 
 /** 加深颜色值 */
@@ -85,12 +85,12 @@ export function lighten(color: string, level: number) {
 export function copyToClip(text: string) {
   return new Promise((resolve, reject) => {
     try {
-      const input: HTMLTextAreaElement = document.createElement('textarea');
-      input.setAttribute('readonly', 'readonly');
+      const input: HTMLTextAreaElement = document.createElement("textarea");
+      input.setAttribute("readonly", "readonly");
       input.value = text;
       document.body.appendChild(input);
       input.select();
-      if (document.execCommand('copy')) document.execCommand('copy');
+      if (document.execCommand("copy")) document.execCommand("copy");
       document.body.removeChild(input);
       resolve(text);
     } catch (error) {
@@ -126,7 +126,7 @@ export function flattenTree(tree: any[]): any[] {
 export function deepClone(source: any) {
   // 过滤特殊情况
   if (source === null) return null;
-  if (typeof source !== 'object') return source;
+  if (typeof source !== "object") return source;
   if (source.constructor === RegExp) return new RegExp(source);
   if (source.constructor === Date) return new Date(source);
   const newObj = new source.constructor();
