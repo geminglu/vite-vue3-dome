@@ -10,22 +10,78 @@ const axiosDefault: AxiosInstance = axios.create({
   baseURL: "/api",
 });
 
-function handelError(error: AxiosError<ResultType>) {
+let isRefreshing = false;
+let failedQueue: {
+  resolve: (value?: unknown) => void;
+  reject: (reason?: any) => void;
+}[] = [];
+
+const processQueue = (error: AxiosError | null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve();
+    }
+  });
+
+  failedQueue = [];
+};
+
+async function handelError(axiosError: AxiosError<ResultType>) {
   const userStore = useUserStore();
-  switch (error.response?.status) {
-    case 401:
-      router.push({ path: "/signIn", query: { redirect: router.currentRoute.value.fullPath } });
-      userStore.logout();
+  switch (axiosError.response?.status) {
+    case 401: {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => {
+            if (axiosError.config) {
+              const data = axiosDefault(axiosError.config);
+              return Promise.resolve(data);
+            }
+            return Promise.reject(axiosError);
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
+      } else {
+        isRefreshing = true;
+        try {
+          await userStore.refreshToken();
+          processQueue(null);
+          if (axiosError.config) {
+            const data = axiosDefault(axiosError.config);
+            return Promise.resolve(data);
+          }
+          return Promise.reject(axiosError);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_) {
+          processQueue(axiosError);
+          router.currentRoute.value.path !== "/signIn" &&
+            router.replace({
+              path: "/signIn",
+              query: { redirect: router.currentRoute.value.fullPath },
+            });
+          userStore.logout();
+          return Promise.reject(axiosError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
       break;
+    }
     default:
       ElMessage({
         showClose: true,
-        message: error.response?.data?.message || error.message,
+        message: axiosError.response?.data?.message || axiosError.message,
         type: "error",
         grouping: true,
       });
       break;
   }
+  return axiosError;
 }
 
 /**
@@ -45,7 +101,6 @@ axiosDefault.interceptors.request.use(
 // 响应拦截器
 axiosDefault.interceptors.response.use(
   (response: AxiosResponse<ResultType>) => {
-    // removeSource(response.config);
     if (!response.data.success) {
       ElMessage({
         showClose: true,
@@ -57,9 +112,8 @@ axiosDefault.interceptors.response.use(
     }
     return Promise.resolve(response);
   },
-  (error: AxiosError<ResultType>) => {
-    handelError(error);
-    return Promise.reject(error);
+  async (error: AxiosError<ResultType>) => {
+    return handelError(error);
   },
 );
 
@@ -68,7 +122,6 @@ axiosDefault.interceptors.response.use(
  * @param config
  * @returns
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function request<T = any>(config: AxiosRequestConfig) {
   return new Promise<ResultType<T>>((resolve, reject) => {
     axiosDefault
@@ -77,7 +130,7 @@ export function request<T = any>(config: AxiosRequestConfig) {
         resolve(response.data);
       })
       .catch(error => {
-        reject(error);
+        reject(error.response?.data);
       });
   });
 }

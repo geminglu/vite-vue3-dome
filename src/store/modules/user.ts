@@ -8,7 +8,6 @@ import {
   refreshToken,
 } from "@/serivce/user";
 import { encrypt } from "@/utils/encrypt";
-// import usePermissioStore from "./permission";
 
 export interface userInfoType {
   /**
@@ -102,7 +101,7 @@ const useUserStore = defineStore("userStore", {
       this.setToken(result.data?.access_token, result.data?.refresh_token);
 
       // 登陆成功后获取用户信息
-      await Promise.all([ /** await usePermissioStore().getSystemMenu() */ this.getUserInfo()]);
+      this.getUserInfo();
       return result;
     },
 
@@ -130,11 +129,12 @@ const useUserStore = defineStore("userStore", {
      * 刷新token
      */
     async refreshToken() {
-      if (!this.refresh_token) return;
+      if (!this.refresh_token) throw new Error();
       const result = await refreshToken(this.refresh_token);
       this.setToken(result.data?.access_token, result.data?.refresh_token);
       // 登陆成功后获取用户信息
       this.getUserInfo();
+      return result;
     },
 
     /**
