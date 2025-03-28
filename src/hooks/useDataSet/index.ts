@@ -95,7 +95,7 @@ function useDataSet(dataSet: configType) {
     try {
       config.disabled = true;
       let result;
-      const param: {
+      let param: {
         [x: string]: any;
       } = {
         ...data,
@@ -111,6 +111,14 @@ function useDataSet(dataSet: configType) {
       if (config.paging) param.page = config.currentPage;
       if (config.paging) param.pageSize = config.pageSize;
 
+      const beforeQuery =
+        events?.beforeQuery && events.beforeQuery({ dataSet: obj, params: param });
+      if (typeof beforeQuery === "boolean" && beforeQuery === false) {
+        return;
+      }
+      if (typeof beforeQuery === "object") {
+        param = beforeQuery;
+      }
       if (config.transport?.read) {
         let axiosRequestConfig: AxiosRequestConfig = {};
         if (typeof config.transport?.read === "function") {

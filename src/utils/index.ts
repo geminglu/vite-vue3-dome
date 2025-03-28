@@ -21,7 +21,10 @@ export function randomColor(min: number, max: number): string {
   return "rgb(" + r + "," + g + "," + b + ")";
 }
 
-export function arrayToTree<T>(list: any[], root = null) {
+export function arrayToTree<T>(
+  list: T[],
+  root = null,
+) {
   const result: (T & { children: T[] })[] = []; // 用于存放结果
   const map: any = {}; // 用于存放 list 下的节点
 

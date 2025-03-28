@@ -98,12 +98,12 @@ export type CreateDeptVo = Omit<
   | "createBy"
 >;
 
-export type queryDept = Pick<
-  DeptDtoInfo,
-  "parentId" | "deptName" | "leader" | "remark" | "status" | "phone" | "email"
+export type queryDept = Partial<
+  Pick<DeptDtoInfo, "parentId" | "deptName" | "leader" | "remark" | "status" | "phone" | "email">
 > & {
-  createTimeStart: string;
-  createTimeEnd: string;
-  updateTimeStart: string;
-  updateTimeEnd: string;
+  lazy?: "0" | "1";
+  createTimeStart?: string;
+  createTimeEnd?: string;
+  updateTimeStart?: string;
+  updateTimeEnd?: string;
 };

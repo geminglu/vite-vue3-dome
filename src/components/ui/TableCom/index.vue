@@ -223,17 +223,7 @@ props.dateSet.config.queryform?.forEach(item => {
 });
 
 async function query() {
-  const beforeQuery =
-    props.dateSet.events?.beforeQuery &&
-    props.dateSet.events.beforeQuery({ dataSet: props.dateSet, params: form });
-  if (typeof beforeQuery === "boolean" && beforeQuery === false) {
-    return;
-  }
-  let params = {};
-  if (typeof beforeQuery === "object") {
-    params = beforeQuery;
-  }
-  props.dateSet.query(params);
+  props.dateSet.query(form.value);
 }
 
 const handleSelectionChange = (val: any) => {

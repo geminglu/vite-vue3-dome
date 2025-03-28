@@ -43,6 +43,7 @@ export interface userInfoType {
    */
   role?: "1" | "0";
   id: string;
+  dept?: number | null;
 }
 
 export interface userType {
