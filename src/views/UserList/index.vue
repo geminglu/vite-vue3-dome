@@ -28,11 +28,61 @@
       </PageHeaderWrapper>
     </div>
   </div>
+  <el-drawer
+    v-model="addDrawer"
+    :title="addDrawerData?.id ? '编辑用户' : '添加用户'"
+    destroy-on-close
+    :before-close="handleClose"
+    @closed="addDrawerData = undefined"
+  >
+    <AddUser ref="addUserRef" :data="addDrawerData" />
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="() => handleClose(handleCloseaddDrawer)">取消</el-button>
+        <el-button type="primary" @click="handleSave" :loading="addDrawerLoading"> 保存 </el-button>
+      </div>
+    </template>
+  </el-drawer>
+
+  <el-dialog v-model="dialogVisible" width="500">
+    <div class="mx-4">
+      <div class="flex justify-center">
+        <Icon icon="iconoir:check-circle-solid" class="text-8xl text-lime-500" />
+      </div>
+      <el-descriptions title="User Info" :column="1">
+        <el-descriptions-item label="姓名">{{ createSuccessData?.name }}</el-descriptions-item>
+        <el-descriptions-item label="手机号">{{ createSuccessData?.phone }}</el-descriptions-item>
+        <el-descriptions-item label="邮箱地址">{{ createSuccessData?.email }}</el-descriptions-item>
+        <el-descriptions-item label="性别">
+          <span v-if="createSuccessData?.gender === '0'" class="text-fuchsia-600">♀︎</span>
+          <span v-else-if="createSuccessData?.gender === '1'" class="text-blue-600">♂︎</span>
+          <span v-else class="text-neutral-600">?</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="所在部门">
+          {{ createSuccessData?.deptName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="密码"
+          >{{ createSuccessData?.password }}
+
+          <CopyButton :text="createSuccessData?.password || ''" class="text-7xl"></CopyButton>
+        </el-descriptions-item>
+        <el-descriptions-item label="备注">{{ createSuccessData?.remark }}</el-descriptions-item>
+      </el-descriptions>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup lang="tsx">
 import { reactive, ref, watch } from "vue";
-import { ElTag, ElTree } from "element-plus";
+import {
+  ElDivider,
+  ElLink,
+  ElPopconfirm,
+  ElTag,
+  ElTree,
+  ElMessage,
+  ElMessageBox,
+} from "element-plus";
 import TableCom from "@/components/ui/TableCom/index.vue";
 import PageHeaderWrapper from "@/components/PageHeaderWrapper/index.vue";
 import useDataSet from "@/hooks/useDataSet";
@@ -40,6 +90,17 @@ import { headerButtonsType } from "@/hooks/useDataSet/type";
 import { queryDeptList } from "@/serivce/system/index";
 import Node from "element-plus/es/components/tree/src/model/node.mjs";
 import { queryDept } from "@/serivce/system/type";
+import {
+  ceratedUser,
+  createdUser,
+  createdUserSuccess,
+  deleteUser,
+  updateUser,
+} from "@/serivce/user";
+import AddUser from "./AddUser.vue";
+import { userInfoType } from "@/store/modules/user";
+import { Icon } from "@iconify/vue";
+import CopyButton from "@/components/ui/CopyButton/index.vue";
 
 defineOptions({
   name: "UserList",
@@ -51,8 +112,14 @@ interface DeptTerr {
   children?: DeptTerr[];
 }
 
+const addUserRef = ref();
+const addDrawer = ref(false);
+const addDrawerData = ref<userInfoType & ceratedUser>();
+const addDrawerLoading = ref(false);
 const filterText = ref("");
 const treeRef = ref<InstanceType<typeof ElTree>>();
+const dialogVisible = ref(false);
+const createSuccessData = ref<createdUserSuccess>();
 
 const deptTerr = reactive<DeptTerr[]>([
   {
@@ -93,15 +160,42 @@ const dateSet = useDataSet({
   autoQuery: false,
   queryUrl: "/v1/user",
   primaryKey: "id",
-  queryform: [{ name: "name", type: "text", label: "用户名" }],
-  fields: [
-    { label: "用户名", name: "name", type: "text", sortOrder: null },
+  queryform: [
+    { name: "name", type: "text", label: "用户名" },
+    { name: "gender", type: "uplook", label: "性别", code: "GENDER" },
+    { name: "isActive", type: "uplook", label: "状态", code: "STATUS" },
     { label: "邮箱", name: "email", type: "text" },
     { label: "手机号", name: "phone", type: "text" },
+  ],
+  fields: [
+    { label: "用户名", name: "name", type: "text", sortOrder: null, minWidth: 150 },
+    { label: "邮箱", name: "email", type: "text", minWidth: 150 },
+    { label: "手机号", name: "phone", type: "text", minWidth: 100 },
+    {
+      label: "性别",
+      name: "gender",
+      type: "text",
+      minWidth: 100,
+      customRender: ({ value }) => {
+        return (
+          <span class="text-base">
+            {value === "0" ? (
+              <span class="text-fuchsia-600">♀︎</span>
+            ) : value === "1" ? (
+              <span class="text-blue-600">♂︎</span>
+            ) : (
+              ""
+            )}
+          </span>
+        );
+      },
+    },
+    { label: "所在部门", name: "deptName", type: "text", minWidth: 150 },
     {
       label: "状态",
       name: "isActive",
       type: "text",
+      minWidth: 100,
       customRender: ({ value }) => {
         return value === "1" ? (
           <ElTag type="primary">启用</ElTag>
@@ -110,7 +204,55 @@ const dateSet = useDataSet({
         );
       },
     },
-    { label: "创建时间", name: "createAt", type: "datetime", sortOrder: null },
+    {
+      label: "创建时间",
+      name: "createAt",
+      minWidth: 150,
+      type: "datetime",
+      sortOrder: null,
+    },
+    {
+      label: "操作",
+      type: "text",
+      name: "operation",
+      width: 200,
+      fixed: "right",
+      customRender: ({ record }) => {
+        return (
+          <span>
+            <ElLink
+              type="primary"
+              underline={false}
+              onClick={() => {
+                {
+                  addDrawerData.value = record as userInfoType & ceratedUser;
+                  addDrawer.value = true;
+                }
+              }}
+            >
+              编辑
+            </ElLink>
+            <ElDivider direction="vertical" />
+            <ElPopconfirm
+              title="删除后无法恢复是否继续？"
+              onConfirm={async () => {
+                await deleteUser(record.id);
+                dateSet.query();
+                ElMessage.success("删除成功");
+              }}
+            >
+              {{
+                reference: (
+                  <ElLink type="danger" underline={false}>
+                    删除
+                  </ElLink>
+                ),
+              }}
+            </ElPopconfirm>
+          </span>
+        );
+      },
+    },
   ],
   paging: true,
   events: {
@@ -159,11 +301,57 @@ const loadNode = async (node: Node, resolve: (data: DeptTerr[]) => void, reject:
     }
   }
 };
+async function handleSave() {
+  try {
+    addDrawerLoading.value = true;
+    const data = await addUserRef.value?.submit();
 
-const filterNode = (value: string, data: DeptTerr[]) => {
-  console.log("filterNode", value, data);
-  return false;
+    if (addDrawerData.value?.id) {
+      await updateUser(addDrawerData.value.id, data);
+      ElMessage({
+        showClose: true,
+        message: "更新成功",
+        type: "success",
+      });
+    } else {
+      const result = await createdUser(data);
+      ElMessage({
+        showClose: true,
+        message: "添加成功",
+        type: "success",
+      });
+      createSuccessData.value = result.data;
+      dialogVisible.value = true;
+    }
+    dateSet.query();
+    addDrawer.value = false;
+  } finally {
+    addDrawerLoading.value = false;
+  }
+}
+
+const handleCloseaddDrawer = () => {
+  addDrawer.value = false;
 };
 
-const headerButtons: headerButtonsType[] = ["refresh"];
+const handleClose = (done: () => void) => {
+  ElMessageBox.confirm("尚未报错确定要关闭吗？", "提示")
+    .then(() => {
+      done();
+    })
+    .catch(() => {
+      // catch error
+    });
+};
+
+const headerButtons: headerButtonsType[] = [
+  "refresh",
+  {
+    name: "新增",
+    icon: "material-symbols:add-rounded",
+    click: () => {
+      addDrawer.value = true;
+    },
+  },
+];
 </script>

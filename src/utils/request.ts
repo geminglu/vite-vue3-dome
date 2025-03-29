@@ -81,7 +81,7 @@ async function handelError(axiosError: AxiosError<ResultType>) {
       });
       break;
   }
-  return axiosError;
+  return Promise.reject(axiosError);
 }
 
 /**

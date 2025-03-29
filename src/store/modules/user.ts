@@ -17,7 +17,7 @@ export interface userInfoType {
   /**
    * 创建时间
    */
-  createAt?: Date;
+  createAt?: string;
   /**
    * 邮箱
    */
@@ -25,7 +25,7 @@ export interface userInfoType {
   /**
    * 性别，1：男；0：女
    */
-  gender?: "1" | "0";
+  gender?: "1" | "0" | "";
   /**
    * 1：启用；0：禁用
    */
@@ -43,7 +43,9 @@ export interface userInfoType {
    */
   role?: "1" | "0";
   id: string;
-  dept?: number | null;
+  deptId?: number | null;
+  deptName?: string;
+  remark?: string;
 }
 
 export interface userType {

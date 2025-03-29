@@ -50,46 +50,15 @@ export interface loginDtoRequest {
   refresh_token: string;
 }
 
-export interface ceratedUser {
-  /**
-   * 头像
-   */
-  avatars?: string;
-  /**
-   * 邮箱
-   */
-  email: string;
-  /**
-   * 性别，1：男；0：女
-   */
-  gender?: "0" | "1" | "";
-  /**
-   * 1：启用；0：禁用
-   */
-  isActive?: "0" | "1";
-  /**
-   * 用户名，用户姓名在2-10之间
-   */
-  name: string;
-  /**
-   * 手机号
-   */
-  phone?: string;
-  /**
-   * 角色，0：管理员：1：普通用户
-   */
-  role?: "0" | "1";
-  /**
-   * 密码
-   */
-  password: string;
-}
+export type ceratedUser = Omit<userInfoType, "id" | "createAt">;
 
 export type updateUserType = Partial<Omit<ceratedUser, "password">>;
 
 export type updateMyUserType = Partial<Omit<ceratedUser, "password" | "Omit" | "isActive">>;
 
 export type updateEmailDto = Pick<ceratedUser, "email"> & { token: string };
+
+export type createdUserSuccess = ceratedUser & { password: string };
 
 /**
  * 验证码业务类型
@@ -159,7 +128,7 @@ export function getPublicKey() {
  * 添加用户
  */
 export function createdUser(data: ceratedUser) {
-  return request<userInfoType>({
+  return request<createdUserSuccess>({
     url: "/v1/user",
     method: "post",
     data,
@@ -171,7 +140,7 @@ export function createdUser(data: ceratedUser) {
  */
 export function updateUser(id: string, data: updateUserType) {
   return request<userInfoType>({
-    url: `/v1/user/info${id}`,
+    url: `/v1/user/info/${id}`,
     method: "patch",
     data,
   });

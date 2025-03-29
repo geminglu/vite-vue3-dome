@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CoptButton: typeof import('./src/components/baseUi/CoptButton/index.vue')['default']
+    CopyButton: typeof import('./src/components/ui/CopyButton/index.vue')['default']
     DashboardCard: typeof import('./src/components/ui/dashboard/DashboardCard.vue')['default']
     DashboardLayout: typeof import('./src/components/ui/dashboard/DashboardLayout.vue')['default']
     DashboardModal: typeof import('./src/components/ui/dashboard/DashboardModal.vue')['default']
@@ -32,6 +33,9 @@ declare module 'vue' {
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
+    ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
+    ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
@@ -56,6 +60,7 @@ declare module 'vue' {
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
+    ElResult: typeof import('element-plus/es')['ElResult']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
@@ -64,6 +69,7 @@ declare module 'vue' {
     ElTree: typeof import('element-plus/es')['ElTree']
     ElTreeV2: typeof import('element-plus/es')['ElTreeV2']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    InputCopyButtonExample: typeof import('./src/components/ui/InputCopyButtonExample.vue')['default']
     PageHeaderWrapper: typeof import('./src/components/PageHeaderWrapper/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
