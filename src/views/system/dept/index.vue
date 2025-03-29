@@ -1,6 +1,14 @@
 <template>
   <PageHeaderWrapper title="部门管理">
-    <TableCom :dateSet="dateSet" :headerButtons="headerButtons" tableHeight="calc(100vh - 210px)" />
+    <TableCom
+      :dateSet="dateSet"
+      :headerButtons="headerButtons"
+      tableHeight="calc(100vh - 210px)"
+      lazy
+      :border="true"
+      :load="load"
+      :tree-props="{ children: 'children', hasChildren: 'id' }"
+    />
   </PageHeaderWrapper>
   <el-drawer
     v-model="addDrawer"
@@ -33,20 +41,10 @@ import {
   ElDivider,
 } from "element-plus";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-const router = useRouter();
 import AddDept from "./AddDept.vue";
-import {
-  createSysMenu,
-  CreateSystemMenu,
-  deleteSysMenu,
-  patchSysMenu,
-  SystemMenuListDto,
-} from "@/serivce/system";
 import { arrayToTree } from "@/utils";
-import { Icon } from "@iconify/vue/dist/iconify.js";
 import { DeptDtoInfo } from "@/serivce/system/type";
-import { createDeptDto, deleteDept, updateDeptDto } from "@/serivce/system/index";
+import { createDeptDto, deleteDept, queryDeptList, updateDeptDto } from "@/serivce/system/index";
 
 defineOptions({
   name: "SystemDept",
@@ -61,6 +59,9 @@ const dateSet = useDataSet({
   queryUrl: "/v1/system/dept",
   primaryKey: "id",
   paging: false,
+  queryParameter: {
+    lazy: 0,
+  },
   events: {
     response: data => {
       return arrayToTree(data.map(item => ({ ...item, pid: item.parentId })));
@@ -199,6 +200,11 @@ const handleClose = (done: () => void) => {
     .catch(() => {
       // catch error
     });
+};
+
+const load = async (row: any, treeNode: any, resolve: (data: any[]) => void) => {
+  const results = (await queryDeptList({ parentId: row.id, lazy: "0" })).data?.list;
+  resolve(results || []);
 };
 </script>
 

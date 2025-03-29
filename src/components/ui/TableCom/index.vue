@@ -92,10 +92,15 @@
       stripe
       @selection-change="handleSelectionChange"
       :size="size"
+      :border
       ref="tableRef"
       @sort-change="sortChange"
       :height="tableHeight"
       :header-cell-class-name="handleHeaderCellClass"
+      lazy
+      :load="load"
+      :treeProps
+      :tableLayout
     >
       <el-table-column
         v-if="dateSet.config.multiple"
@@ -159,43 +164,28 @@
 </template>
 
 <script setup lang="tsx">
-import { ref, PropType, defineComponent, reactive } from "vue";
-import type { headerButtonsType } from "@/hooks/useDataSet/type";
+import { ref, defineComponent, reactive } from "vue";
 import UpLook from "@/components/ui/uplook/index.vue";
 import { ElTable, ElTableColumn, FormInstance, FormRules } from "element-plus";
 import dayjs from "dayjs";
 import { Icon } from "@iconify/vue";
-import { useDataSetType } from "@/hooks/useDataSet";
+import { PropsType } from "./type";
 
 defineOptions({
   name: "BaseTable",
 });
 
-const props = defineProps({
-  dateSet: {
-    type: Object as PropType<useDataSetType>,
-    default: () => {},
-  },
-  headerButtons: {
-    type: Array as PropType<headerButtonsType[]>,
-    default: () => [],
-  },
-  border: {
-    type: Boolean,
-    default: false,
-  },
-  size: {
-    type: String as PropType<"large" | "default" | "small">,
-    default: "large",
-  },
-  pagingLayout: {
-    type: String,
-    default: "total, sizes, prev, pager, next, jumper",
-  },
-  tableHeight: {
-    type: String,
-  },
+const props = withDefaults(defineProps<PropsType>(), {
+  border: false,
+  size: "large",
+  pagingLayout: "total, sizes, prev, pager, next, jumper",
+  lazy: false,
+  tableLayout: "fixed",
+  headerButtons: () => [],
+  treeProps: () => ({ hasChildren: "hasChildren", children: "children", checkStrictly: false }),
 });
+console.log(props);
+
 
 const orderMap = {
   asc: "ascending",
