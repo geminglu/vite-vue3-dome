@@ -107,3 +107,57 @@ export type queryDept = Partial<
   updateTimeStart?: string;
   updateTimeEnd?: string;
 };
+
+/**
+ * CreateRoleDto
+ */
+export interface CreateRoleDto {
+  /**
+   * 角色名称
+   */
+  name: string;
+  /**
+   * 备注
+   */
+  remark?: string;
+}
+
+/**
+ * RoleInfoDto
+ */
+export interface RoleInfoDto extends CreateRoleDto {
+  /**
+   * 创建时间
+   */
+  createAt: Date;
+  /**
+   * 角色Id
+   */
+  id: number;
+  /**
+   * 创建时间
+   */
+  updateTime: Date;
+}
+
+export type UpdateRoleDto = CreateRoleDto;
+
+export interface QueryDeptDto {
+  /**
+   * 角色名称
+   */
+  name?: string;
+  /**
+   * 页码
+   */
+  page: number;
+  /**
+   * 分页大小
+   */
+  pageSize: number;
+  /**
+   * 排序
+   */
+  sort?: string;
+  [property: string]: any;
+}

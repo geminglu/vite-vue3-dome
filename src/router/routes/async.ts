@@ -38,6 +38,11 @@ export const asyncRoutes: Array<AppRouteRecordRaw> = [
         name: "SystemDept",
         component: () => import("@/views/system/dept/index.vue"),
       },
+      {
+        path: "/system/system-role",
+        name: "SystemDept",
+        component: () => import("@/views/system/role/index.vue"),
+      },
     ],
   },
 ];
