@@ -6,13 +6,21 @@
     <el-form-item label="备注" prop="remark">
       <el-input v-model="form.remark" type="textarea" />
     </el-form-item>
+    <el-form-item label="权限" prop="menuPermissions">
+      <MenuPermission
+        ref="menuPermissionRef"
+        :menuPermissions="form.menuPermissions"
+        :onChange="changePermission"
+      />
+    </el-form-item>
   </el-form>
 </template>
 
 <script setup lang="ts">
 import { FormInstance, FormRules } from "element-plus";
 import { reactive, ref } from "vue";
-import { CreateRoleDto, RoleInfoDto } from "@/serivce/system/type";
+import { RoleInfoDto } from "@/serivce/system/type";
+import MenuPermission from "@/views/system/role/components/MenuPermission.vue";
 
 defineOptions({
   name: "AddRole",
@@ -24,17 +32,23 @@ interface PropsType {
 
 const props = defineProps<PropsType>();
 
-const { remark, name } = props.data || {};
+const { remark, name, menuPermissions } = props.data || {};
 
-const form = reactive<CreateRoleDto>({
+const form = reactive({
   remark: remark || "",
   name: name || "",
+  menuPermissions: menuPermissions || [],
 });
 
 const formRef = ref<FormInstance>();
 
-const rules: FormRules<CreateRoleDto> = {
+const rules: FormRules<typeof form> = {
   name: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
+};
+
+const changePermission = (value: string[]) => {
+  form.menuPermissions.length = 0;
+  form.menuPermissions.push(...value);
 };
 
 async function submit() {

@@ -120,6 +120,8 @@ export interface CreateRoleDto {
    * 备注
    */
   remark?: string;
+
+  menuPermissions?: string[];
 }
 
 /**
@@ -129,7 +131,7 @@ export interface RoleInfoDto extends CreateRoleDto {
   /**
    * 创建时间
    */
-  createAt: Date;
+  createAt: string;
   /**
    * 角色Id
    */
@@ -137,7 +139,7 @@ export interface RoleInfoDto extends CreateRoleDto {
   /**
    * 创建时间
    */
-  updateTime: Date;
+  updateTime: string;
 }
 
 export type UpdateRoleDto = CreateRoleDto;

@@ -1572,10 +1572,10 @@ electron-to-chromium@^1.5.73:
   resolved "https://mirrors.cloud.tencent.com/npm/electron-to-chromium/-/electron-to-chromium-1.5.75.tgz#bba96eabf0e8ca36324679caa38b982800acc87d"
   integrity sha512-Lf3++DumRE/QmweGjU+ZcKqQ+3bKkU/qjaKYhIJKEOhgIO9Xs6IiAQFkfFoj+RhgDk4LUeNsLo6plExHqSyu6Q==
 
-element-plus@^2.9.1:
-  version "2.9.1"
-  resolved "https://mirrors.cloud.tencent.com/npm/element-plus/-/element-plus-2.9.1.tgz#00cac40abaafe8806fc77b2552050e14a7693680"
-  integrity sha512-9Agqf/jt4Ugk7EZ6C5LME71sgkvauPCsnvJN12Xid2XVobjufxMGpRE4L7pS4luJMOmFAH3J0NgYEGZT5r+NDg==
+element-plus@^2.9.7:
+  version "2.9.7"
+  resolved "https://mirrors.cloud.tencent.com/npm/element-plus/-/element-plus-2.9.7.tgz#05bcc35de1d98192d25ebfd06fff7d6d2de9f911"
+  integrity sha512-6vjZh5SXBncLhUwJGTVKS5oDljfgGMh6J4zVTeAZK3YdMUN76FgpvHkwwFXocpJpMbii6rDYU3sgie64FyPerQ==
   dependencies:
     "@ctrl/tinycolor" "^3.4.1"
     "@element-plus/icons-vue" "^2.3.1"

@@ -46,6 +46,10 @@ export interface userInfoType {
   deptId?: number | null;
   deptName?: string;
   remark?: string;
+  /**
+   * 角色列表
+   */
+  roles?: string[]
 }
 
 export interface userType {

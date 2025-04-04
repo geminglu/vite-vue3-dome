@@ -16,6 +16,11 @@
         <el-radio value="">保密</el-radio>
       </el-radio-group>
     </el-form-item>
+    <el-form-item label="角色" prop="roles">
+      <el-select v-model="form.roles" multiple filterable :reserve-keyword="false" class="w-full">
+        <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
+      </el-select>
+    </el-form-item>
     <el-form-item label="所在部门" prop="dept">
       <el-cascader
         :options="deptList"
@@ -23,6 +28,7 @@
         :props="{ checkStrictly: true, emitPath: false, value: 'id', label: 'deptName' }"
         :show-all-levels="false"
         clearable
+        class="w-full"
       />
     </el-form-item>
     <el-form-item label="状态" prop="status">
@@ -40,12 +46,14 @@
 <script setup lang="tsx">
 import { FormInstance, FormRules } from "element-plus";
 import { reactive, ref, onMounted } from "vue";
-import { DeptDtoInfo } from "@/serivce/system/type";
+import { DeptDtoInfo, type RoleInfoDto } from "@/serivce/system/type";
 import { queryDeptList } from "@/serivce/system/index";
 import { arrayToTree } from "@/utils";
 import { ceratedUser } from "@/serivce/user";
 import { phoneReg } from "@/utils/regular";
 import { userInfoType } from "@/store/modules/user";
+import { queryRoleList } from "@/serivce/system/role";
+
 defineOptions({
   name: "AddUser",
 });
@@ -56,19 +64,20 @@ interface PropsType {
 
 const props = defineProps<PropsType>();
 
-const { deptId, avatars, remark, email, gender, isActive, name, phone, role } =
+const { deptId, avatars, roles, remark, email, gender, isActive, name, phone, role } =
   props.data || {};
 
 const form = reactive<ceratedUser>({
   avatars: avatars || "",
   email: email || "",
-  gender: gender || '',
+  gender: gender || "",
   isActive: isActive || "1",
   name: name || "",
   phone: phone || "",
   role: role || "0",
   deptId: deptId,
   remark: remark || "",
+  roles: roles || [],
 });
 
 const formRef = ref<FormInstance>();
@@ -85,7 +94,9 @@ const rules: FormRules<ceratedUser> = {
       trigger: "blur",
     },
   ],
+  roles: [{ required: true, type: "array" }],
 };
+const roleList = reactive<RoleInfoDto[]>([]);
 
 const deptList = reactive<DeptDtoInfo[]>([]);
 
@@ -100,6 +111,14 @@ onMounted(() => {
         })),
       ),
     );
+  });
+
+  queryRoleList({
+    page: 1,
+    pageSize: 999999,
+  }).then(res => {
+    roleList.length = 0;
+    roleList.push(...(res.data?.list || []));
   });
 });
 

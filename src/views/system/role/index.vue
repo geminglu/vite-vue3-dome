@@ -17,6 +17,23 @@
       </div>
     </template>
   </el-drawer>
+  <el-drawer
+    v-model="menuPermissionDrawer"
+    title="菜单权限"
+    destroy-on-close
+    :before-close="handleClose"
+    @closed="addDrawerData = undefined"
+  >
+    <MenuPermission ref="menuPermissionRef" :menuPermissions="addDrawerData?.menuPermissions" />
+    <template #footer>
+      <div style="flex: auto">
+        <el-button @click="() => handleClose(handleCloseMenuPermission)">取消</el-button>
+        <el-button type="primary" @click="handleUpdateMenuPermission" :loading="addDrawerLoading">
+          保存
+        </el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang="tsx">
@@ -28,6 +45,7 @@ import { ref } from "vue";
 import AddRole from "./AddRole.vue";
 import { createRole, deleteRole, updateRole } from "@/serivce/system/role";
 import { RoleInfoDto } from "@/serivce/system/type";
+import MenuPermission from "./components/MenuPermission.vue";
 
 defineOptions({
   name: "SystemRole",
@@ -36,7 +54,10 @@ defineOptions({
 const addDrawer = ref(false);
 const addDrawerLoading = ref(false);
 const addDeptRef = ref();
+const menuPermissionDrawer = ref(false);
 const addDrawerData = ref<RoleInfoDto | undefined>();
+const menuPermissionRef = ref();
+
 const dateSet = useDataSet({
   autoQuery: true,
   queryUrl: "/v1/system/role",
@@ -66,6 +87,17 @@ const dateSet = useDataSet({
               }}
             >
               编辑
+            </ElLink>
+            <ElDivider direction="vertical" />
+            <ElLink
+              type="primary"
+              underline={false}
+              onClick={() => {
+                addDrawerData.value = record as RoleInfoDto;
+                menuPermissionDrawer.value = true;
+              }}
+            >
+              菜单权限
             </ElLink>
             <ElDivider direction="vertical" />
             <ElPopconfirm
@@ -112,7 +144,6 @@ async function handleSave() {
   try {
     addDrawerLoading.value = true;
     const data = await addDeptRef.value?.submit();
-
     if (addDrawerData.value?.id) {
       await updateRole(addDrawerData.value.id, data);
       ElMessage({
@@ -135,8 +166,26 @@ async function handleSave() {
   }
 }
 
+async function handleUpdateMenuPermission() {
+  const data = menuPermissionRef.value.submit();
+  try {
+    addDrawerLoading.value = true;
+    if (addDrawerData.value?.id) {
+      await updateRole(addDrawerData.value.id, { menuPermissions: data });
+    }
+    handleCloseMenuPermission();
+    dateSet.query();
+  } finally {
+    addDrawerLoading.value = false;
+  }
+}
+
 const handleCloseaddDrawer = () => {
   addDrawer.value = false;
+};
+
+const handleCloseMenuPermission = () => {
+  menuPermissionDrawer.value = false;
 };
 
 const handleClose = (done: () => void) => {
@@ -149,8 +198,3 @@ const handleClose = (done: () => void) => {
     });
 };
 </script>
-
-<style scoped lang="less">
-.systemMenu {
-}
-</style>

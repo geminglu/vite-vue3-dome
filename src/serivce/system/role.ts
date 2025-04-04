@@ -32,7 +32,7 @@ export function deleteRole(id: number) {
   });
 }
 
-export function updateRole(id: number, data: CreateRoleDto) {
+export function updateRole(id: number, data: Partial<CreateRoleDto>) {
   return request({
     url: `/v1/system/role/${id}`,
     method: "PATCH",
